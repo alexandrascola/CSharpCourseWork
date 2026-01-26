@@ -1,0 +1,15 @@
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\bin\Debug\net10.0\Module2Calculator.exe
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\bin\Debug\net10.0\Module2Calculator.deps.json
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\bin\Debug\net10.0\Module2Calculator.runtimeconfig.json
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\bin\Debug\net10.0\Module2Calculator.dll
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\bin\Debug\net10.0\Module2Calculator.pdb
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\Module2Calculator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\Module2Calculator.AssemblyInfoInputs.cache
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\Module2Calculator.AssemblyInfo.cs
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\Module2Calculator.csproj.CoreCompileInputs.cache
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\Module2Calculator.dll
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\refint\Module2Calculator.dll
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\Module2Calculator.pdb
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\Module2Calculator.genruntimeconfig.cache
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\ref\Module2Calculator.dll
+C:\Users\alexa\source\repos\Module2Calculator\Module2Calculator\obj\Debug\net10.0\Module2Calculator.sourcelink.json
