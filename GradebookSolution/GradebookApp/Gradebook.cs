@@ -26,13 +26,25 @@ namespace GradebookApp
         }
 
         //Get average method
-
+        public double GetAverage()
+        {
+            if (grades.Count == 0) return 0;
+            double total = 0;
+            foreach (var g in grades)
+                total += g;
+            return total / grades.Count;
+        }
+    
         //Get highest grade method
+        public double GetHighest() => grades.Count == 0 ? 0 : grades.Max();
 
         //Get lowest grade method
+        public double GetLowest() => grades.Count == 0 ? 0 : grades.Min();
 
         //Get count method
+        public int GetCount() => grades.Count;
 
         //Clear all grades method
+        public void Clear() => grades.Clear();
     }
 }

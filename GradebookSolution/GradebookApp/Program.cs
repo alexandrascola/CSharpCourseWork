@@ -19,7 +19,7 @@ namespace GradebookApp
 
             while (running)
             {
-                Console.WriteLine("/nMenu:");
+                Console.WriteLine("\nMenu:");
                 Console.WriteLine("1. Add a grade");
                 Console.WriteLine("2. View summary");
                 Console.WriteLine("3. Clear all grades");
@@ -29,6 +29,25 @@ namespace GradebookApp
                 //String to capture user choice
                 string choice = Console.ReadLine();
 
+                switch (choice)
+                {
+                    case "1":
+                        AddGrades(book);
+                        break;
+                    case "2":
+                        ShowSummary(book);
+                        break;
+                    case "3":
+                        book.Clear();
+                        break;
+                    case "4":
+                        Console.WriteLine("Goodbye");
+                        running = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid, try again.");
+                        break;
+                }
 
             }
         }
@@ -62,6 +81,15 @@ namespace GradebookApp
             }
         }
 
+        //Method to print summary
+        private static void ShowSummary(Gradebook book)
+        {
+            Console.WriteLine("\n--- Grade Summary ---");
+            Console.WriteLine($"Grades Entered: {book.GetCount()}");
+            Console.WriteLine($"Highest Grade: {book.GetHighest():F2}");
+            Console.WriteLine($"Lowest Grade: {book.GetLowest():F2}");
+            Console.WriteLine($"Average Grade: {book.GetAverage():F2}");
 
+        }
     }
 }
