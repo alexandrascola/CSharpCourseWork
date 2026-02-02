@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using GradebookApp;
 
 namespace Gradebook.Tests
 {
@@ -10,7 +11,7 @@ namespace Gradebook.Tests
         [Fact]
         public void AddGrade_AddsValidGrade()
         { 
-            var book = new Gradebook();
+            var book = new GradebookApp.Gradebook();
             book.AddGrade(90);
             Assert.Equal(1, book.GetCount());
         }
@@ -18,7 +19,7 @@ namespace Gradebook.Tests
         [Fact]
         public void AddGrade_RejectsInvalidGrade()
         {
-            var book = new Gradebook();
+            var book = new GradebookApp.Gradebook();
             Assert.Throws<ArgumentOutOfRangeException>( () => book.AddGrade(150));
         }
 
@@ -26,7 +27,7 @@ namespace Gradebook.Tests
         [Fact]
         public void GetAverage_ReturnsCorrectAverage()
         {
-            var book = new Gradebook();
+            var book = new GradebookApp.Gradebook();
             book.AddGrade(new List<double> { 80, 90, 100 });
             Assert.Equal(90, book.GetAverage(), 2);
         }
@@ -35,7 +36,7 @@ namespace Gradebook.Tests
         [Fact]
         public void GetHighestAndLowest_WorksCorrectly()
         {
-            var book = new Gradebook();
+            var book = new GradebookApp.Gradebook();
             book.AddGrade(new List<double> { 70, 85, 95 });
             Assert.Equal(95, book.GetHighest());
             Assert.Equal(70, book.GetLowest());
