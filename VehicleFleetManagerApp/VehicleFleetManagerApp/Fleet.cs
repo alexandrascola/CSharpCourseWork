@@ -7,7 +7,7 @@ namespace Vehicle_Fleet_Manager
     internal class Fleet
     {
         //Create list to hold vehicles
-        private readonly List<Vehicle> _vehicle = new();
+        private readonly List<Vehicle> _vehicles = new();
 
 
 
@@ -15,11 +15,11 @@ namespace Vehicle_Fleet_Manager
         public void AddVehicle(Vehicle v)
         {
             if (v == null) throw new ArgumentNullException(nameof(v));
-            _vehicle.Add(v);
+            _vehicles.Add(v);
         }
 
         //Void to remove vehicles
-
+        
 
 
         //Double to get average mileage
@@ -27,7 +27,25 @@ namespace Vehicle_Fleet_Manager
 
 
         //Void to display vehicles
+        public void DisplayAllVehicles()
+        {
+            //Control for empty list
+            if (_vehicles.Count == 0)
+            {
+                Console.WriteLine("No vehicles in the fleet.");
+                return;
 
+            }
+
+            //Foreach through list of vehicles
+            Console.WriteLine("\n--- Fleet Summary ---");
+            foreach (var v in _vehicles)
+            {
+                Console.WriteLine(v.GetSummary());
+
+            }
+
+        }
 
 
         //Void to service all vehicles

@@ -45,7 +45,7 @@ namespace Vehicle_Fleet_Manager
         public double LastServiceMileage
             {
             get => _lastServiceMileage;
-            set => _lastServiceMileage = (value >= 0)
+            set => _lastServiceMileage = value >= 0
                 ? value
                 : throw new ArgumentOutOfRangeException(nameof(value), "Last service mileage must be between 0 and current mileage.");
         }
@@ -67,12 +67,23 @@ namespace Vehicle_Fleet_Manager
         //Adding mileage
 
 
-        //Bool for needs service
+
+        //Boolean for needs service
+        public bool NeedsService() => (Mileage - LastServiceMileage) >= 10000;
+
+
 
 
         //Void for perfornm service
 
 
+
         //String for get summary
+        public string GetSummary()
+        {
+            string status = NeedsService() ? "Service Due" : "Good";
+            return $"{Year} {Make} {Model} - {Mileage:N0}, mi - (status)";
+        }
+
     }
 }
