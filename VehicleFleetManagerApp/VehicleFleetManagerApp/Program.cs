@@ -40,6 +40,12 @@ namespace Vehicle_Fleet_Manager
                     case "3":
                         fleet.DisplayAllVehicles();
                         break;
+                    case "4":
+                        Console.WriteLine($"Average Mileage: {fleet.GetAverageMileage():N0} mi");
+                        break;
+                    case "5":
+                        fleet.ServiceAllDue();
+                        break;
                     case "6":
                         running = false;
                         break;
