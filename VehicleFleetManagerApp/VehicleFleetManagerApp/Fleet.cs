@@ -19,11 +19,27 @@ namespace Vehicle_Fleet_Manager
         }
 
         //Void to remove vehicles
-        
+        public void RemoveVehicle(string model)
+        {
+            var toRemove = _vehicles.FirstOrDefault(v =>
+            v.Model.Equals(model, StringComparison.OrdinalIgnoreCase));
+
+            if (toRemove != null)
+            {
+                _vehicles.Remove(toRemove);
+                Console.WriteLine($"{model} removed from fleet.");
+            }
+            else
+            {
+                Console.WriteLine("Vehicle not found.");
+            }
+        }
+
 
 
         //Double to get average mileage
-
+        public double GetAverageMileage() =>
+            _vehicles.Count == 0 ? 0 : _vehicles.Average(v => v.Mileage);
 
 
         //Void to display vehicles
@@ -49,6 +65,21 @@ namespace Vehicle_Fleet_Manager
 
 
         //Void to service all vehicles
+        public void ServiceAllDue()
+        {
+            int serviced = 0;
+            foreach (var v in _vehicles)
+            {
+                if (v.NeedsService())
+                {
+                    serviced++;
+                    v.PerformService();
+                   
+                }
+
+            }
+            Console.WriteLine($"{serviced} vehicle(s) serviced.");
+        }
 
     }
 }

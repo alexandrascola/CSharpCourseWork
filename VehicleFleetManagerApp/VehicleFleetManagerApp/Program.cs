@@ -34,6 +34,12 @@ namespace Vehicle_Fleet_Manager
                     case "1":
                         AddVehicleMenu(fleet);
                         break;
+                    case "2":
+                        RemoveVehicleMenu(fleet);
+                        break;
+                    case "3":
+                        fleet.DisplayAllVehicles();
+                        break;
                     case "6":
                         running = false;
                         break;
@@ -65,5 +71,11 @@ namespace Vehicle_Fleet_Manager
         }
 
         //Method to remove vehicle
+        private static void RemoveVehicleMenu(Fleet fleet)
+        {
+            Console.Write("Enter models to remove: ");
+            string model = Console.ReadLine() ?? "";
+            fleet.RemoveVehicle(model);
+        }
     }
 }

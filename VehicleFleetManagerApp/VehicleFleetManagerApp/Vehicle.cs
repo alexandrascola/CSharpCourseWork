@@ -65,16 +65,18 @@ namespace Vehicle_Fleet_Manager
 
         //METHODS:
         //Adding mileage
-
-
+        public void AddMileage(double miles)
+        {
+            if (miles < 0)
+                throw new ArgumentOutOfRangeException(nameof(miles), "Miles must be positive.");
+            Mileage += miles;
+        }
 
         //Boolean for needs service
         public bool NeedsService() => (Mileage - LastServiceMileage) >= 10000;
 
-
-
-
-        //Void for perfornm service
+        //Void for perform service
+        public void PerformService() => LastServiceMileage = Mileage;
 
 
 
