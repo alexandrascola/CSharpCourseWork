@@ -52,10 +52,15 @@ namespace Vehicle_Fleet_Manager
 
         //CONSTRUCTORS:
         //Default constructor
-        public Vehicle() { 
-
+        public Vehicle() { }
+        public Vehicle(string make, string model, int year, double mileage)
+        {
+            Make = make;
+            Model = model;
+            Year = year;
+            Mileage = mileage;
+            LastServiceMileage = mileage; //Initial service at creation
         }
-
 
 
         //METHODS:

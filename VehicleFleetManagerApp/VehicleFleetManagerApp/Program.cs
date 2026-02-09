@@ -10,6 +10,8 @@ namespace Vehicle_Fleet_Manager
         
             Console.WriteLine("===Vehicle Fleet Manager==");
 
+            //Create fleet
+            var fleet = new Fleet();
 
             bool running = true;
             while (running)
@@ -29,10 +31,12 @@ namespace Vehicle_Fleet_Manager
                     default:
                         Console.WriteLine("Invalid Choice");
                         break;
+                    case "1":
+                        AddVehicleMenu(fleet);
+                        break;
                     case "6":
                         running = false;
                         break;
-                    
 
                 }
             }
@@ -41,7 +45,24 @@ namespace Vehicle_Fleet_Manager
         }
 
         //Method to add vehicle
+        private static void AddVehicleMenu(Fleet fleet)
+        {
+            Console.Write("Enter make: ");
+            string make = Console.ReadLine() ?? "";
 
+            Console.Write("Enter model: ");
+            string model = Console.ReadLine() ?? "";
+
+            Console.Write("Enter year: ");
+            int year = int.TryParse(Console.ReadLine(), out int y) ? y : 0;
+
+            Console.Write("Enter mileage: ");
+            double mileage = double.TryParse(Console.ReadLine(), out double m) ? m : 0;
+
+            var v = new Vehicle(make, model, year, mileage);
+            fleet.AddVehicle(v);
+            Console.WriteLine("Vehicle Added Successfully.");
+        }
 
         //Method to remove vehicle
     }
