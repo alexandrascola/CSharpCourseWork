@@ -22,8 +22,8 @@ public class Program
             Console.WriteLine("3. Display All Tickets");
             Console.WriteLine("4. Close Ticket");
             Console.WriteLine("5. Reopen Ticket");
-            Console.WriteLine("6. Save Tickets to CSV file");
-            Console.WriteLine("7. Load Tickets from CSV file");
+            Console.WriteLine("6. Load Tickets to CSV file");
+            Console.WriteLine("7. Save Tickets from CSV file");
             Console.WriteLine("8. Show Open Ticket Count");
             Console.WriteLine("9. Exit");
             Console.Write("Choose: ");

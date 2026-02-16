@@ -120,7 +120,7 @@ namespace ITSupportTicketManagerApp
                     if (!DateTime.TryParse(created, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var when))
                         throw new InvalidDataException($"Invalid DateCreated");
 
-                    var t = new Ticket(id, description, priority, created);
+                    var t = new Ticket(id, description, priority, status);
                     //Override autocreated date with persisted value
                     typeof(Ticket).GetProperty(nameof(Ticket.DateCreated))!
                         .SetValue(t, when);
