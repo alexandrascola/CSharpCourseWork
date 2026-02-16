@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Text;
 
 namespace ITSupportTicketManagerApp
@@ -46,14 +47,14 @@ namespace ITSupportTicketManagerApp
                 Console.WriteLine("No tickets found.");
                 return;
             }
-            
+
             Console.WriteLine("\n--- Ticket List---");
             foreach (var t in _tickets)
-                    Console.WriteLine(t.GetSummary());
+                Console.WriteLine(t.GetSummary());
         }
 
         //Int Method to COUNT open tickets
-        public int GetOpenCount() 
+        public int GetOpenCount()
         {
             int count = 0;
             foreach (var t in _tickets)
@@ -63,9 +64,67 @@ namespace ITSupportTicketManagerApp
         }
 
         // --------------- CSV Persistence ---------------
+        //Header: Id,Description,Priority,Status,DateCreated
+
+        //Void Method to SAVE tickets
+
+
+        //Void Method to LOAD tickets
 
 
 
+        //----------------Mininmal CSV Helper Methods-----------------
+        //String Method to ESCAPE
 
+
+        //List Method to PARSE CSV File
+        private static List<string> CsvParse(string line)
+        {
+            var result = new List<string>();
+            var sb = new StringBuilder();
+            bool inQuotes = false;
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                if (inQuotes)
+                {
+                    if (c == '"')
+                    {
+                        //Escaped Quotes
+                        if (i + 1 < line.Length && line[i + 1] == '"')
+                        {
+                            sb.Append('"');
+                            i++;
+                        }
+                        else
+                        {
+                            inQuotes = false;
+                        }
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+                else
+                {
+                    if (c == ',')
+                    {
+                        result.Add(sb.ToString());
+                        sb.Clear();
+                    }
+                    else if (c == '"')
+                    {
+                        inQuotes = true;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            result.Add(sb.ToString());
+            return result;
+        }
     }
 }
