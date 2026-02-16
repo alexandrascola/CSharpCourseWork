@@ -70,12 +70,68 @@ namespace ITSupportTicketManagerApp
 
 
         //Void Method to LOAD tickets
+        public void LoadTickets(string path)
+        {
+            using var sr = new StreamReader(path, Encoding.UTF8);
 
+            //Clear Current List Before Unloading File
+            _tickets.Clear();
+
+            string? header = sr.ReadLine();
+            if (header is null)
+                throw new InvalidDataException("File is empty.");
+
+            int lineNo = 1, loaded = 0, skipped = 0;
+
+            while (!sr.EndOfStream)
+            {
+                string? line = sr.ReadLine();
+                lineNo++;
+                if (string.IsNullOrWhiteSpace(line)) { continue;  }
+
+                try
+                {
+                    var cols = CsvParse(line);
+                    if (cols.Count != 5)
+                        throw new InvalidDataException($"Expected 5 columns, found {cols.Count}.");
+                    string id = cols[0];
+                    string description = cols[1];
+                    string priority = cols[2];
+                    string status = cols[3];
+                    string created = cols[4];
+
+                    if (!DateTime.TryParse(created, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var when))
+                        throw new InvalidDataException($"Invalid DateCreated");
+
+                    var t = new Ticket(id, description, priority, created);
+                    //Override autocreated date with persisted value
+                    typeof(Ticket).GetProperty(nameof(Ticket.DateCreated))!
+                        .SetValue(t, when);
+                    AddTicket(t);
+                    loaded++;
+
+                }
+                catch (Exception ex)
+                {
+                    skipped++;
+                    Console.WriteLine($"Skipped line {lineNo} {ex.Message}");
+                }
+
+            }
+
+
+            Console.WriteLine($"Load Complete. Loaded: {loaded}, Skipped: {skipped}");
+        }
 
 
         //----------------Mininmal CSV Helper Methods-----------------
         //String Method to ESCAPE
-
+        private static string CsvEscape(string input) 
+        { 
+            bool needsQuotes = input.Contains(',') || input.Contains('"') || input.Contains('\n') || input.Contains('\r');
+            if (!needsQuotes) return input;
+            return "\"" + input.Replace("\"", "\"\"") + "\"";
+        }
 
         //List Method to PARSE CSV File
         private static List<string> CsvParse(string line)
