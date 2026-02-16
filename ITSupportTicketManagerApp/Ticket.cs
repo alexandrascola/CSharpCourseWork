@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ITSupportTicketManagerApp
 {
-    internal class Ticket
+    public class Ticket
     {
         //Class Variables
         private string _id = "";
