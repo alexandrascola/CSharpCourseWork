@@ -71,8 +71,14 @@ namespace ITSupportTicketManagerApp
             DateCreated = DateTime.UtcNow;
         }
 
-
         //Processing Methods
+        public void CloseTicket() => Status = "Closed";
+        public void ReopenTicket() => Status = "Open";
+
+        public string GetSummary() =>
+            $"[{Id}] ({Priority}) \"{Description}\" | Status: {Status} | Created (UTC): {DateCreated:yyyy-MM-dd HH:mm}";
+
+
 
 
     }
