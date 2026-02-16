@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Globalization;
 using System.Text;
 
 namespace ITSupportTicketManagerApp
@@ -67,7 +68,23 @@ namespace ITSupportTicketManagerApp
         //Header: Id,Description,Priority,Status,DateCreated
 
         //Void Method to SAVE tickets
-
+        public void SaveTickets(string path)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
+            using var sw = new StreamWriter(path, false, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            sw.WriteLine("Id,Description,Priority,Status,DateCreated");
+            foreach (var t in _tickets)
+            {
+                string line = string.Join(",",
+                    CsvEscape(t.Id),
+                    CsvEscape(t.Description),
+                    CsvEscape(t.Priority),
+                    CsvEscape(t.Status),
+                    CsvEscape(t.DateCreated.ToString("o", CultureInfo.InvariantCulture)) //ISO 8601
+                    );
+                sw.WriteLine(line);
+            }
+        }
 
         //Void Method to LOAD tickets
         public void LoadTickets(string path)
