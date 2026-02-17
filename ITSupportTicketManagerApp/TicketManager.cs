@@ -104,8 +104,10 @@ namespace ITSupportTicketManagerApp
             {
                 string? line = sr.ReadLine();
                 lineNo++;
-                if (string.IsNullOrWhiteSpace(line)) { continue;  }
-
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (line.Contains('\t')) 
+                    throw new InvalidDataException("Invalid format. Tab-separated file detected. Requires comma-separation in CSV.");
+                
                 try
                 {
                     var cols = CsvParse(line);
