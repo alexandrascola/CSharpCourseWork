@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MedicalAppointmentScheduler
+namespace MedScheduler
 {
     public class Appointment
     {
