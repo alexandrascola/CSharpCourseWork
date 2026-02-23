@@ -1,10 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace MedicalAppointmentScheduler
+namespace MedScheduler
 {
-    internal class Exceptions
+    // Create a Business-rule exception for overlapping appointments (same provider or same room)
+    public class DoubleBookingException : Exception
     {
+        public DoubleBookingException(string message) : base(message) { }
     }
+
+
+
+    // Create a Business-rule exception for outside hours, short duration, etc.
+    public class InvalidAppointmentTimeException : Exception
+    {
+        public InvalidAppointmentTimeException(string message) : base(message) { }
+    }
+
 }
