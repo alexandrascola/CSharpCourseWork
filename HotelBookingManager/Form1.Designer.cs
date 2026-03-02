@@ -327,6 +327,7 @@
             lvBookings.Size = new Size(1003, 298);
             lvBookings.TabIndex = 14;
             lvBookings.UseCompatibleStateImageBehavior = false;
+            lvBookings.View = View.Details;
             // 
             // Room
             // 
