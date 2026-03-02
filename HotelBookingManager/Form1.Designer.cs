@@ -330,18 +330,22 @@
             // 
             // Room
             // 
+            Room.Text = "Room";
             Room.Width = 80;
             // 
             // Check_In
             // 
+            Check_In.Text = "Check-In";
             Check_In.Width = 140;
             // 
             // Check_Out
             // 
+            Check_Out.Text = "Check-Out";
             Check_Out.Width = 140;
             // 
             // Guest
             // 
+            Guest.Text = "Guest";
             Guest.Width = 250;
             // 
             // Form1
