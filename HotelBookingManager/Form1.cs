@@ -6,5 +6,10 @@ namespace HotelBookingManager
         {
             InitializeComponent();
         }
+
+        private void lblWelcomeLabel_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
