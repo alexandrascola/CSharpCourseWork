@@ -10,6 +10,85 @@
         //Delare a BookingManager object
         private readonly BookingManager manager = new();
 
+        //Events
+        private void btnBook_Click(object sender, EventArgs e) => BookRoom();
+        private void btnCancel_Click(object sender, EventArgs e) => CancelBooking();
+        private void btnView_Click(object sender, EventArgs e) => RefreshList();
+        private void btnExit_Click(object sender, EventArgs e) => Close();
+
+        //Void to Book a Room
+        private void BookRoom()
+        {
+            try
+            {
+                var room = txtRoom.Text.Trim();
+                var guest = txtGuest.Text.Trim();
+                var c_in = dtIn.Value;
+                var c_out = dtOut.Value;
+
+                //Validate guest and room are not empty
+                if (string.IsNullOrWhiteSpace(room) || string.IsNullOrWhiteSpace(guest))
+                    throw new ArgumentException("Guest and Room are required.");
+                //validate check out is after check in
+                if (c_out <= c_in)
+                    throw new ArgumentException("Check Out must be after Check In.");
+                //Create Booking and Add it
+                var b = new Booking(room, guest, c_in, c_out);
+                manager.Add(b);
+                //Call Helpers
+                RefreshList();
+                ClearInputs();
+                SetStatus($"Room {room} book for {guest}.", success: true);
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(ex.Message, "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                SetStatus(ex.Message, success: false);
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Conflict", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                SetStatus(ex.Message, success: false);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unexpected error. See details.\n", ex.Message,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetStatus("Unexpected error.", success: false);
+            }
+        }
+        //Void to Cancel a Booking
+        private void CancelBooking() 
+        {
+            //get info from text boxes
+            var room = txtRoom.Text.Trim();
+            var guest = txtGuest.Text.Trim();
+
+            //Reject empty text boxes
+            if (string.IsNullOrWhiteSpace(room) || string.IsNullOrWhiteSpace(guest))
+            {
+                MessageBox.Show("Enter both Room and Guest to cancel.", "Cancel Booking",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            //Attempt to Cancel the Booking
+            var ok = manager.Cancel(room, guest);
+            if (ok)
+            {
+                RefreshList();
+                ClearInputs();
+                SetStatus($"Cancelled booking for {guest} in room {room}.", success: true);
+            }
+            else 
+            {
+                MessageBox.Show("No matching booking found.", "Cancel Booking",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SetStatus("No matching booking found.", success: false);
+            }
+
+        }
+
         //Method to refresh booking list view
         private void RefreshList()
         {
@@ -96,6 +175,10 @@
             btnExit = new Button();
             lblStatus = new Label();
             lvBookings = new ListView();
+            Room = new ColumnHeader();
+            Check_In = new ColumnHeader();
+            Check_Out = new ColumnHeader();
+            Guest = new ColumnHeader();
             SuspendLayout();
             // 
             // lblWelcomeLabel
@@ -107,7 +190,7 @@
             lblWelcomeLabel.Name = "lblWelcomeLabel";
             lblWelcomeLabel.Size = new Size(774, 70);
             lblWelcomeLabel.TabIndex = 0;
-            lblWelcomeLabel.Text = "Welcome to the Wrenfield Hotel";
+            lblWelcomeLabel.Text = "Welcome to The Overlook Hotel";
             lblWelcomeLabel.TextAlign = ContentAlignment.MiddleCenter;
             lblWelcomeLabel.Click += lblWelcomeLabel_Click;
             // 
@@ -193,6 +276,7 @@
             btnBook.TabIndex = 9;
             btnBook.Text = "Book Room";
             btnBook.UseVisualStyleBackColor = true;
+            btnBook.Click += btnBook_Click;
             // 
             // btnCancel
             // 
@@ -202,6 +286,7 @@
             btnCancel.TabIndex = 10;
             btnCancel.Text = "Cancel Booking";
             btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
             // 
             // btnView
             // 
@@ -211,6 +296,7 @@
             btnView.TabIndex = 11;
             btnView.Text = "View All Bookings";
             btnView.UseVisualStyleBackColor = true;
+            btnView.Click += btnView_Click;
             // 
             // btnExit
             // 
@@ -220,6 +306,7 @@
             btnExit.TabIndex = 12;
             btnExit.Text = "Exit";
             btnExit.UseVisualStyleBackColor = true;
+            btnExit.Click += btnExit_Click;
             // 
             // lblStatus
             // 
@@ -234,11 +321,28 @@
             // 
             // lvBookings
             // 
+            lvBookings.Columns.AddRange(new ColumnHeader[] { Room, Check_In, Check_Out, Guest });
             lvBookings.Location = new Point(45, 310);
             lvBookings.Name = "lvBookings";
             lvBookings.Size = new Size(1003, 298);
             lvBookings.TabIndex = 14;
             lvBookings.UseCompatibleStateImageBehavior = false;
+            // 
+            // Room
+            // 
+            Room.Width = 80;
+            // 
+            // Check_In
+            // 
+            Check_In.Width = 140;
+            // 
+            // Check_Out
+            // 
+            Check_Out.Width = 140;
+            // 
+            // Guest
+            // 
+            Guest.Width = 250;
             // 
             // Form1
             // 
@@ -284,5 +388,9 @@
         private Button btnExit;
         private Label lblStatus;
         private ListView lvBookings;
+        private ColumnHeader Room;
+        private ColumnHeader Check_In;
+        private ColumnHeader Check_Out;
+        private ColumnHeader Guest;
     }
 }
