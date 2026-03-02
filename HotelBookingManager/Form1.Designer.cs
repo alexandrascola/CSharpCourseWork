@@ -7,6 +7,59 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+        //Delare a BookingManager object
+        private readonly BookingManager manager = new();
+
+        //Method to refresh booking list view
+        private void RefreshList()
+        {
+            lvBookings.BeginUpdate();
+            lvBookings.Items.Clear();
+
+            foreach (var b in manager.All())
+            {
+                var item = new ListViewItem(new[]
+                    {
+                        b.RoomNumber,
+                        b.CheckIn.ToString("yyyy-MM-dd HH:mm"),
+                        b.CheckOut.ToString("yyyy-MM-dd HH:mm"),
+                        b.GuestName
+                    });
+                lvBookings.Items.Add(item);
+            }
+
+            lvBookings.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvBookings.EndUpdate();
+            SetStatus($"Loaded {lvBookings.Items.Count} booking(s).", success: true);
+        }
+
+        //Void to load selected booking into inputs
+        private void LoadSelectionIntoInputs()
+        {
+            if (lvBookings.SelectedItems.Count == 0) return;
+            var sel = lvBookings.SelectedItems[0];
+            txtRoom.Text = sel.SubItems[0].Text;
+            dtIn.Value = DateTime.Parse(sel.SubItems[1].Text);
+            dtOut.Value = DateTime.Parse(sel.SubItems[2].Text);
+            txtGuest.Text = sel.SubItems[3].Text;
+            SetStatus("Loaded selection into inputs.", success: true);
+        }
+
+        //Void to update the Status label
+        private void SetStatus(string message, bool success)
+        {
+            lblStatus.Text = message;
+            lblStatus.ForeColor = success ? Color.FromArgb(24, 128, 26) : Color.FromArgb(176, 32, 32);
+        }
+
+        //Void to clear all innputs
+        private void ClearInputs()
+        {
+            txtGuest.Clear();
+            txtRoom.Clear();
+            txtGuest.Focus();
+        }
+
         /// <summary>
         ///  Clean up any resources being used.
         /// </summary>
@@ -84,7 +137,7 @@
             // 
             lblCheckIn.AutoSize = true;
             lblCheckIn.ForeColor = SystemColors.ButtonFace;
-            lblCheckIn.Location = new Point(71, 229);
+            lblCheckIn.Location = new Point(71, 174);
             lblCheckIn.Name = "lblCheckIn";
             lblCheckIn.Size = new Size(85, 25);
             lblCheckIn.TabIndex = 3;
@@ -95,7 +148,7 @@
             // 
             lblCheckOut.AutoSize = true;
             lblCheckOut.ForeColor = SystemColors.ButtonFace;
-            lblCheckOut.Location = new Point(540, 228);
+            lblCheckOut.Location = new Point(540, 174);
             lblCheckOut.Name = "lblCheckOut";
             lblCheckOut.Size = new Size(100, 25);
             lblCheckOut.TabIndex = 4;
@@ -120,21 +173,21 @@
             // 
             // dtIn
             // 
-            dtIn.Location = new Point(181, 229);
+            dtIn.Location = new Point(181, 174);
             dtIn.Name = "dtIn";
             dtIn.Size = new Size(331, 31);
             dtIn.TabIndex = 7;
             // 
             // dtOut
             // 
-            dtOut.Location = new Point(646, 229);
+            dtOut.Location = new Point(660, 174);
             dtOut.Name = "dtOut";
             dtOut.Size = new Size(300, 31);
             dtOut.TabIndex = 8;
             // 
             // btnBook
             // 
-            btnBook.Location = new Point(167, 300);
+            btnBook.Location = new Point(134, 248);
             btnBook.Name = "btnBook";
             btnBook.Size = new Size(155, 38);
             btnBook.TabIndex = 9;
@@ -143,7 +196,7 @@
             // 
             // btnCancel
             // 
-            btnCancel.Location = new Point(368, 300);
+            btnCancel.Location = new Point(311, 248);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(157, 38);
             btnCancel.TabIndex = 10;
@@ -152,7 +205,7 @@
             // 
             // btnView
             // 
-            btnView.Location = new Point(553, 300);
+            btnView.Location = new Point(568, 248);
             btnView.Name = "btnView";
             btnView.Size = new Size(166, 38);
             btnView.TabIndex = 11;
@@ -161,7 +214,7 @@
             // 
             // btnExit
             // 
-            btnExit.Location = new Point(800, 300);
+            btnExit.Location = new Point(751, 248);
             btnExit.Name = "btnExit";
             btnExit.Size = new Size(118, 38);
             btnExit.TabIndex = 12;
@@ -173,7 +226,7 @@
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblStatus.ForeColor = SystemColors.ButtonFace;
-            lblStatus.Location = new Point(82, 611);
+            lblStatus.Location = new Point(45, 611);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(83, 32);
             lblStatus.TabIndex = 13;
@@ -181,9 +234,9 @@
             // 
             // lvBookings
             // 
-            lvBookings.Location = new Point(69, 354);
+            lvBookings.Location = new Point(45, 310);
             lvBookings.Name = "lvBookings";
-            lvBookings.Size = new Size(968, 236);
+            lvBookings.Size = new Size(1003, 298);
             lvBookings.TabIndex = 14;
             lvBookings.UseCompatibleStateImageBehavior = false;
             // 
