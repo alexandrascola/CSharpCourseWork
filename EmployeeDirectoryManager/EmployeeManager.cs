@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace EmployeeDirectoryManager
@@ -9,37 +10,46 @@ namespace EmployeeDirectoryManager
     public sealed class EmployeeManager
     {
         //Create a public binding list of Employee objects and initialize as new. It will need a get; method
-		
+		public BindingList<Employee> Employees { get; } = new();
 
         // Add with validation (unique Id)
         public void AddEmployee(Employee e)
         {
             //Create an if statement to look for duplicate employees. Throw an exception if there is one
-			
-			//Then add the employee to the list
-			
+			if (Employees.Any(x => string.Equals(x.Id, e.Id, StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidOperationException($"An employee with ID '{e.Id}' already exists.");
+            //Then add the employee to the list
+            Employees.Add(e);
         }
 
         // Update by Id (replace fields)
         public void UpdateEmployee(Employee updated)
         {
             //Create a var and check the list for the Employee's Id. If the result is null, throw an exception.
-
-			
-			//If not null, assign the employee variables here-
-
+            var exists = Employees.FirstOrDefault(x => string.Equals(x.Id, updated.Id, StringComparison.OrdinalIgnoreCase));
+            if (exists is null)
+                throw new InvalidOperationException($"Employee '{updated.Id}' not found.");
+            //If not null, assign the employee variables here-
+            exists.FullName = updated.FullName;
+            exists.Department = updated.Department;
+            exists.Role = updated.Role;
+            exists.Salary = updated.Salary;
+            exists.HireDate = updated.HireDate;
         }
 
         // Delete by Id
         public bool RemoveEmployee(string id)
         {
             //Check if the Employee exists and store that result in a var
-			
-			//If the var is null, return false
-			
-			//If the var is not null, Remove the employee and return true
-
+			var exists = Employees.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
+            //If the var is null, return false
+            if (exists is null) return false;
+            //If the var is not null, Remove the employee and return true
+            Employees.Remove(exists); 
+            return true;
         }
+
+
 
 		//!!! Helper Methods for the CSV. Do not modify anything below this line
         // -------- Persistence (CSV) --------
