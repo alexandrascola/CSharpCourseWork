@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.Text;
+using System.Xml.Linq;
 
 namespace EmployeeDirectoryManager
 {
@@ -22,6 +25,8 @@ namespace EmployeeDirectoryManager
         private readonly Button btnSave = new() { Text = "Save" };
         private readonly Button btnLoad = new() { Text = "Load" };
         private readonly Button btnExit = new() { Text = "Exit" };
+
+        
 
         //DATAGRID and STATUS
         private readonly DataGridView grid = new()
@@ -69,17 +74,197 @@ namespace EmployeeDirectoryManager
 
             //ROW 1 LABELS
             txtId.Anchor = txtName.Anchor = txtDepartment.Anchor = txtRole.Anchor = txtSalary.Anchor = dtHire.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            top.Controls.Add(txtId, 0, 1);
+            top.Controls.Add(txtName, 1, 1);
+            top.Controls.Add(txtDepartment, 2, 1);
+            top.Controls.Add(txtRole, 3, 1);
+            top.Controls.Add(txtSalary, 4, 1);
+            top.Controls.Add(dtHire, 5, 1);
 
+            //BUTTON ROW
+            var btnRow = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 60, Padding = new Padding(10, 0, 10, 0) };
+            btnRow.Controls.AddRange(new Control[] { btnAdd, btnUpdate, btnDelete, btnSave, btnLoad, btnExit});
+            
+            btnAdd.AutoSize = true;
+            btnUpdate.AutoSize = true;
+            btnDelete.AutoSize = true;
+            btnSave.AutoSize = true;
+            btnLoad.AutoSize = true;
+            btnExit.AutoSize = true;
+
+            //GRID
+            grid.Columns.Add(new DataGridViewTextBoxColumn 
+            { DataPropertyName = nameof(Employee.Id), HeaderText = "ID", Width = 90 });
+            grid.Columns.Add(new DataGridViewTextBoxColumn 
+            { DataPropertyName = nameof(Employee.FullName), HeaderText = "Name", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill });
+            grid.Columns.Add(new DataGridViewTextBoxColumn 
+            { DataPropertyName = nameof(Employee.Department), HeaderText = "Department", Width = 120 });
+            grid.Columns.Add(new DataGridViewTextBoxColumn 
+            { DataPropertyName = nameof(Employee.Role), HeaderText = "Role", Width = 160 });
+            grid.Columns.Add(new DataGridViewTextBoxColumn 
+            { DataPropertyName = nameof(Employee.Salary), HeaderText = "Salary", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "C0" } });
+            grid.Columns.Add(new DataGridViewTextBoxColumn 
+            { DataPropertyName = nameof(Employee.HireDate), HeaderText = "Hire Date", Width = 110, DefaultCellStyle = new DataGridViewCellStyle { Format = "yyyy-MM-dd" } });
+
+
+            //Bind the grid
+            grid.DataSource = manager.Employees;
+
+            //STATUS BAR
+            var status = new Panel {Dock = DockStyle.Bottom, Height = 40, Padding = new Padding(10, 6, 10, 6) };
+            lblStatus.Dock = DockStyle.Fill;
+            status.Controls.Add(lblStatus);
 
 
             //Compose the Form
+            Controls.Add(grid);
+            Controls.Add(btnRow);
             Controls.Add(top);
+            Controls.Add(status);
 
+            //Default Values
+            dtHire.Value = DateTime.Today;
+
+            //Events
+            btnAdd.Click += (_, __) => AddEmployee();
+            btnUpdate.Click += (_, __) => UpdateEmployee();
+            btnDelete.Click += (_, __) => DeleteEmployee();
+            btnSave.Click += (_, __) => SaveEmployees();
+            btnLoad.Click += (_, __) => LoadEmployees();
+            btnExit.Click += (_, __) => Close();
+            grid.SelectionChanged += (_, __) => LoadSelectionToInputs();
+
+            //DoubleClick Method to edit fields quickly
+            grid.CellDoubleClick += (_, __) => LoadSelectionToInputs();
         }
 
-
-
         //Actions (Methods)
+        private void AddEmployee() 
+        {
+            try 
+            { 
+                var (id, name, department, role, salary, hire) = ReadInputs(); 
+                manager.AddEmployee(new Employee(id, name, department, role, salary, hire));
+                SetStatus($"Added {id} - {name}", true);
+                ClearInputs();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Add Employee", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                SetStatus(ex.Message, false);
+            }
+        }
+        private void UpdateEmployee() 
+        {
+            try
+            {
+                var (id, name, department, role, salary, hire) = ReadInputs();
+                manager.UpdateEmployee(new Employee(id, name, department, role, salary, hire));
+                grid.Refresh(); //update grid
+                SetStatus($"Updated {id}", true);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Update Employee", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                SetStatus(ex.Message, false);
+            }
+        }
 
+        private void DeleteEmployee() 
+        {
+            var id = txtId.Text.Trim();
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                MessageBox.Show("Enter an Employee ID to delete.", "Delete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (manager.RemoveEmployee(id))
+            {
+                SetStatus($"Deleted {id}", true);
+                ClearInputs();
+            }
+            else 
+            {
+                MessageBox.Show($"Employee not found.", "Delete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SetStatus("Employee not found.", false);
+            }
+            
+        }
+        private void SaveEmployees() 
+        {
+            using var sfd = new SaveFileDialog { Filter = "CSV Files|*.csv", FileName = "employees.csv" };
+            if (sfd.ShowDialog(this) != DialogResult.OK) return;
+            try
+            {
+                manager.SaveToCsv(sfd.FileName);
+                SetStatus($"Saved {manager.Employees.Count} employee(s) to {sfd.FileName}", true);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetStatus("Save Failed.", false);
+            }
+        }
+        private void LoadEmployees()
+        {
+            using var ofd = new OpenFileDialog { Filter = "CSV Files|*.csv", FileName = "employees.csv" };
+            if (ofd.ShowDialog(this) != DialogResult.OK) return;
+            try
+            {
+                manager.SaveToCsv(ofd.FileName);
+                SetStatus($"Saved {manager.Employees.Count} employees(s) to {ofd.FileName}", true);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetStatus("Load Failed.", false);
+            }
+        }
+
+        private void LoadSelectionToInputs() 
+        {
+            if (grid.CurrentRow?.DataBoundItem is not Employee e) return;
+            txtId.Text = e.Id;
+            txtName.Text = e.FullName;
+            txtDepartment.Text = e.Department;
+            txtRole.Text = e.Role;
+            txtSalary.Text = e.Salary.ToString();
+            dtHire.Value = e.HireDate;
+            SetStatus($"Selected {e.Id}", true);
+        }
+
+        //Helper methods
+        private (string id, string name, string department, string role, double salary, DateTime hire) ReadInputs()
+        {
+            var id = txtId.Text.Trim();
+            var name = txtName.Text.Trim();
+            var department = txtDepartment.Text.Trim();
+            var role = txtRole.Text.Trim();
+            if (!double.TryParse(txtSalary.Text.Trim(), System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture, out var salary))
+                throw new ArgumentException("Salary must be a valid number.");
+            var hire = dtHire.Value.Date;
+
+            //Basics checks for validity
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(department))
+                throw new ArgumentException("All text fields required.");
+            if (salary < 0) throw new ArgumentException("Salary must be positive.");
+            if (hire > DateTime.Today) throw new ArgumentException("Hire date cannot be in the future.");
+            return (id, name, department, role, salary, hire);
+        }
+        private void ClearInputs()
+        {
+            txtId.Clear();
+            txtName.Clear();
+            txtDepartment.Clear();
+            txtRole.Clear();
+            txtSalary.Clear();
+            dtHire.Value = DateTime.Today;
+            txtId.Focus();
+        }
+        private void SetStatus(string message, bool success)
+        {
+            lblStatus.Text = message;
+            lblStatus.ForeColor = success ? Color.FromArgb(24,128,56) : Color.FromArgb(176, 32, 32);
+        }
     }
 }
