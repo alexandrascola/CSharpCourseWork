@@ -20,13 +20,13 @@ namespace InventoryManagerDb
         private readonly TextBox txtSearchCat  = new() { PlaceholderText = "Search category..." };
 
         // Buttons
-        private readonly Button btnAdd     = new() { Text = "Add" };
-        private readonly Button btnUpdate  = new() { Text = "Update" };
-        private readonly Button btnDelete  = new() { Text = "Delete" };
-        private readonly Button btnRefresh = new() { Text = "Refresh" };
-        private readonly Button btnSearch  = new() { Text = "Search" };
-        private readonly Button btnClear   = new() { Text = "Clear Filters" };
-        private readonly Button btnExit    = new() { Text = "Exit" };
+        private readonly Button btnAdd     = new() { Text = "Add", AutoSize = true};
+        private readonly Button btnUpdate = new() { Text = "Update", AutoSize = true };
+        private readonly Button btnDelete  = new() { Text = "Delete", AutoSize = true };
+        private readonly Button btnRefresh = new() { Text = "Refresh", AutoSize = true };
+        private readonly Button btnSearch  = new() { Text = "Search" , AutoSize = true };
+        private readonly Button btnClear   = new() { Text = "Clear Filters" , AutoSize = true };
+        private readonly Button btnExit    = new() { Text = "Exit" , AutoSize = true };
 
         // Grid + status
         private readonly DataGridView grid = new()
