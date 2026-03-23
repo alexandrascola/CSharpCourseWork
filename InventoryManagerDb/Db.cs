@@ -33,9 +33,12 @@ namespace InventoryManagerDb
         {
             using var conn = new SQLiteConnection(ConnStr);
             conn.Open();
-			//Make a var that takes the result of a SQLiteDataAdatper and pass in the query and conn.
-			//Make a DataTable, Fill it with the contents of the var and return the table
-            
+			//Make a var that takes the result of a SQLiteDataAdapter and pass in the query and conn.
+            using var da = new SQLiteDataAdapter("SELECT Id, Name, Category, Quantity, Price FROM Products ORDER BY Name;", conn);
+            //Make a DataTable, Fill it with the contents of the var and return the table
+            var table = new DataTable();
+            da.Fill(table);
+            return table;
         }
 
         public static DataTable Search(string? nameLike, string? categoryLike)
@@ -44,17 +47,30 @@ namespace InventoryManagerDb
             conn.Open();
 
 			//Create a string named sql for a select statement then create a var for the SQL command
-            
+            string sql = "SELECT Id, Name, Category, Quantity, Price FROM Products WHERE 1=1";
+            using var cmd = new SQLiteCommand(conn);
 
-			//Create some validation to add parameters if the name or category is unclear
-            
-			
-			//Make the query order by name and execute. Use += on your string to concatenate more query parameters
+            //Create some validation to add parameters if the name or category is unclear
+            if (!string.IsNullOrWhiteSpace(nameLike))
+            {
+                sql += " AND Name LIKE @n";
+                cmd.Parameters.AddWithValue("@n", $"%{nameLike.Trim()}%");
+            }
 
+            if (!string.IsNullOrWhiteSpace(categoryLike)) 
+            {
+                sql += " AND Category LIKE @c";
+                cmd.Parameters.AddWithValue("@c", $"%{categoryLike.Trim()}%");
+            }
+            //Make the query order by name and execute. Use += on your string to concatenate more query parameters
+            sql += " ORDER BY Name;";
+            cmd.CommandText = sql;
 
-			//Load the results into a DataTable and return the table
-            
-			
+            //Load the results into a DataTable and return the table
+            using var da = new SQLiteDataAdapter(cmd);
+            var table = new DataTable();
+            da.Fill(table);
+            return table;
         }
 
         public static void Insert(Product p)
@@ -63,12 +79,18 @@ namespace InventoryManagerDb
 			using var conn = new SQLiteConnection(ConnStr);
             conn.Open();
             
-			//Create a string named sql with an insert statement. 
-			
-			//Then make a command and add insert parameters
-			
-			//Use ExecuteNonQuery() for this one because it does not return anything
-			
+			//Create a string named sql with an insert statement.
+            string sql = @"INSERT INTO Products (Name, Category, Quantity, Price)
+                            VALUES(@name, @cat, @qty, @price);";
+            //Then make a command and add insert parameters
+            using var cmd = new SQLiteCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@name", p.Name);
+            cmd.Parameters.AddWithValue("@cat", p.Category);
+            cmd.Parameters.AddWithValue("@qty", p.Quantity);
+            cmd.Parameters.AddWithValue("@price", p.Price);
+
+            //Use ExecuteNonQuery() for this one because it does not return anything
+            cmd.ExecuteNonQuery();
         }
 
         public static void Update(Product p)
@@ -79,11 +101,20 @@ namespace InventoryManagerDb
             conn.Open();
             
 			//Create a string named sql with an Update query
-			
-			//Then create a command and add the update parameters
-			
-			//Use ExecuteNonQuery() to run this one
-            
+			string sql = @"UPDATE Products 
+                            SET Name=@name, Category=@cat, Quantity=@qty, Price=@price
+                            WHERE Id=@id;";
+
+            //Then create a command and add the update parameters
+            using var cmd = new SQLiteCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@name", p.Name);
+            cmd.Parameters.AddWithValue("@cat", p.Category);
+            cmd.Parameters.AddWithValue("@qty", p.Quantity);
+            cmd.Parameters.AddWithValue("@price", p.Price);
+            cmd.Parameters.AddWithValue("@id", p.Id);
+
+            //Use ExecuteNonQuery() to run this one
+            cmd.ExecuteNonQuery();
         }
 
         public static void Delete(long id)
