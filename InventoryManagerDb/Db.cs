@@ -12,13 +12,20 @@ namespace InventoryManagerDb
         {
             using var conn = new SQLiteConnection(ConnStr);
             conn.Open();
-			//Write a Query as a string that will create the Table if it does not exist.
-			//PK should be an autoincrementing INT. Name and category are Text, not null
-			//Price and Quantity are Not Null Integers. Price should be real
+            //Write a Query as a string that will create the Table if it does not exist.
+            //PK should be an autoincrementing INT. Name and category are Text, not null
+            //Price and Quantity are Not Null Integers. Price should be real
+            string sql =
+                @"CREATE TABLE IF NOT EXISTS Products(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT NOT NULL,
+                    Category TEXT NOT NULL,
+                    Quantity INTEGER NOT NULL CHECK(Quantity >= 0),
+                    Price REAL NOT NULL CHECK(Price >= 0)
+                );";
 
-			
             //Use this to execute your string which should be named sql
-			using var cmd = new SQLiteCommand(sql, conn);
+            using var cmd = new SQLiteCommand(sql, conn);
             cmd.ExecuteNonQuery();
         }
 
