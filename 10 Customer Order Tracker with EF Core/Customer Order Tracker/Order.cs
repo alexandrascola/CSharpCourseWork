@@ -12,11 +12,14 @@ public class Order
     //Create a public Double for TotalAmount. Give it Get Set
     //Give it a Range that goes from 0 to the Max Value of a Double. 
     //Look up the function instead of trying to write it out
-
+    [Range(0, double.MaxValue)]
+    public double TotalAmount { get; set; }
 
     //Create a public int of CustomerId with Get/Set
     //Create a public Customer with Get/Set
     //Then set these as the Foreign Key for Customer
-
+    [ForeignKey(nameof(Customer))]
+    public int CustomerID { get; set; }
+    public Customer? Customer { get; set; }
 
 }
