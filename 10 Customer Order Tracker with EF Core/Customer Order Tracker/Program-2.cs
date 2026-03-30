@@ -100,18 +100,34 @@ static async Task AddCustomerInteractive()
     var email = (Console.ReadLine() ?? "").Trim();
 
     // Write an if statement to validate Name and Email input
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        Console.WriteLine("Customer name is required.");
+        return;
+    }
+    if (string.IsNullOrWhiteSpace(email))
+    {
+        Console.WriteLine("Email is required");
+        return;
+    }
 
+    //Create a new TrackerContext as a var
+    using var ctx = new TrackerContext();
 
-	//Create a new TrackerContext as a var
-	
-	//Create a var for a customer
-	
-	//Then Add the new customer to Customers
-	
-	//Save Changes
-	
-	//Report to end user that the customer was added
+    //Create a var for a customer
+    var customer = new Customer
+    {
+        Name = name,
+        Email = email
+    };
+    //Then Add the new customer to Customers
+    ctx.Customers.Add(customer);
 
+    //Save Changes
+    await ctx.SaveChangesAsync();
+
+    //Report to end user that the customer was added
+    Console.WriteLine($"Customer added with ID: {customer.CustomerID} - {customer.Name} ({customer.Email})");
 }
 
 static async Task AddOrderInteractive()
@@ -128,17 +144,28 @@ static async Task AddOrderInteractive()
 
     using var ctx = new TrackerContext();
 
-    // Create some validtion to prevent orphaned orders: verify customer exists
-    
-	
-	//Then create the new order and add it using the Tracker Context (ctx)
-    
-	
-	//After you add the order, use this to save the information:
+    // Create some validation to prevent orphaned orders: verify customer exists
+    var customer = await ctx.Customers.FindAsync(customerId);
+    if (customer is null)
+    {
+        Console.WriteLine("Customer not found. Order not created.");
+        return;
+    }
+
+        //Then create the new order and add it using the Tracker Context (ctx)
+        var order = new Order
+        {
+            CustomerID = customerId,
+            TotalAmount = totalAmount,
+            OrderDate = DateTime.UtcNow
+        };
+    ctx.Orders.Add(order);
+
+    //After you add the order, use this to save the information:
     await ctx.SaveChangesAsync();
 
 	//Then write an update to the console for the end user:
-    
+    Console.WriteLine($"Order added: {order.OrderID} - ${order.TotalAmount:0.00} on {order.OrderDate:u} for {customer.Name}");
 }
 
 static async Task ViewOrdersInteractive()
@@ -162,7 +189,11 @@ static async Task ViewOrdersInteractive()
 	//Create a foreach for the orders we queried
 	//For each one, get the customer name or make it Unknown
 	//Print the OrderID, OrderDate, TotalAmount, CustomerName, CustomerID
-
+    foreach (var o in orders)
+    {
+        var custName = o.Customer?.Name ?? "(unknown)";
+        Console.WriteLine($" - Order {o.OrderID}: {o.OrderDate:u} ${o.TotalAmount:0.00} Customer: {custName} (ID {o.CustomerID})");
+    }
 }
 
 static async Task UpdateCustomerEmailInteractive()
@@ -182,16 +213,20 @@ static async Task UpdateCustomerEmailInteractive()
     var customer = await ctx.Customers.FindAsync(customerId);
 
 	//Create validaiton for customer not found (is null)
-    
+    if (customer is null)
+    {
+        Console.WriteLine("Customer not found.");
+        return;
+    }
 
-	//Set the customer Email to hte newEmail
-    
-	
-	//Save the changes
-    
+    //Set the customer Email to the newEmail
+    customer.Email = newEmail;
 
-	//Update the end user in the console
-    
+    //Save the changes
+    await ctx.SaveChangesAsync();
+
+    //Update the end user in the console
+    Console.WriteLine($"Updated customer {customer.CustomerID}: {customer.Name} --> {customer.Email}");
 }
 
 static async Task DeleteCustomerInteractive()
@@ -202,7 +237,7 @@ static async Task DeleteCustomerInteractive()
 
     var customer = await ctx.Customers
         .Include(c => c.Orders)
-        .FirstOrDefaultAsync(c => c.CustomerId == customerId);
+        .FirstOrDefaultAsync(c => c.CustomerID == customerId);
 
     if (customer is null)
     {
@@ -210,13 +245,20 @@ static async Task DeleteCustomerInteractive()
         return;
     }
 
-    Console.WriteLine($"Deleting customer: {customer.CustomerId} - {customer.Name} ({customer.Email})");
+    Console.WriteLine($"Deleting customer: {customer.CustomerID} - {customer.Name} ({customer.Email})");
     if (customer.Orders.Count > 0)
         Console.WriteLine($"NOTE: This customer has {customer.Orders.Count} order(s).");
 
 	//Force the end user to write YES before we delete the customer
 	//If anything other than YES or yes comes in, report that it was cancelled
+    Console.Write("Type YES to confirm: ");
+    var confirm = (Console.ReadLine() ?? "").Trim();
 
+    if (!confirm.Equals("YES", StringComparison.OrdinalIgnoreCase))
+    {
+        Console.WriteLine("Delete cancelled.");
+        return;
+    }
 
     // This will succeed if cascade delete is configured.
     // If not, you may need to delete orders first.
@@ -233,14 +275,18 @@ static async Task DeleteOrderInteractive()
     using var ctx = new TrackerContext();
     var order = await ctx.Orders.FindAsync(orderId);
 
-    //Validate if the order is null and exit the oeration
-
-
-	//Remove from the Orders table and then save the changes
-
-
-	///Report the result to the end user:
+    //Validate if the order is null and exit the operation
+    if (order is null)
+    {
+        Console.WriteLine("Order not found.");
+        return;
+    }
     
+    //Remove from the Orders table and then save the changes
+    ctx.Orders.Remove(order);
+    await ctx.SaveChangesAsync();
+    ///Report the result to the end user:
+    Console.WriteLine ($"Order {orderId} deleted.");
 }
 
 //Freebie select statement to use as an example. No modification needed:
@@ -251,7 +297,7 @@ static async Task ListCustomersInteractive()
     var customers = await ctx.Customers
         .Select(c => new
         {
-            c.CustomerId,
+            c.CustomerID,
             c.Name,
             c.Email,
             OrderCount = c.Orders.Count,
@@ -269,7 +315,7 @@ static async Task ListCustomersInteractive()
 
     foreach (var c in customers)
     {
-        Console.WriteLine($" - {c.CustomerId}: {c.Name,-20} {c.Email,-25} | Orders: {c.OrderCount,2}  Spent: ${c.TotalSpent:0.00}");
+        Console.WriteLine($" - {c.CustomerID}: {c.Name,-20} {c.Email,-25} | Orders: {c.OrderCount,2}  Spent: ${c.TotalSpent:0.00}");
     }
 }
 //!!! Helper Methods to make reading input easer, no need to modify

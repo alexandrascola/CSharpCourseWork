@@ -18,6 +18,6 @@ public class Customer
     public string Email { get; set; } = string.Empty;
 
     //Create a public List of Orders. Give it Get/Set and initialize new
-    public List<Orders> Orders { get; set; } = new();
+    public List<Order> Orders { get; set; } = new();
 }
 
