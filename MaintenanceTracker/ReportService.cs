@@ -70,6 +70,56 @@ namespace MaintenanceTracker
             return (overall, perTech);
 
         }
+        //Async task to report weekly labor 
+        public async Task<List<WeeklyHours>> WeeklyLaborAsync(MaintenanceContext db)
+        {
+            var data = await db.WorkOrders.AsNoTracking().ToListAsync();
+
+            return data
+                .GroupBy( w=> WeekStartMonday(w.RequestDate))
+                .Select(g => new WeeklyHours(g.Key, g.Count(), Math.Round(g.Sum(x => x.HoursWorked), 1)))
+                .OrderBy(x => x.WeekOf)
+                .ToList();
+        }
+
+        //Async task to report top performers
+        public async Task<TopPerf?> TopPerformerAsync(MaintenanceContext db, int minClosed = 3)
+        {
+            var data = await db.WorkOrders.AsNoTracking().Include(w => w.Technician).ToListAsync();
+
+            var s = data.Where(w => w.Status == "Closed" && w.CompletionDate.HasValue)
+                .GroupBy(w => w.Technician.Name)
+                .Select(g => new TopPerf(
+                    g.Key,
+                    g.Count(),
+                    g.Average(w => (w.CompletionDate.Value - w.RequestDate).TotalDays)
+                ))
+                .Where(x => x.Closed >= minClosed)
+                .OrderBy(x => x.AvgDays)
+                .FirstOrDefault();
+        return s is null ? null : s with {  AvgDays =Math.Round(s.AvgDays, 1) };
+        }
+
+        //Async task to get bonus info
+        public async Task<BonusResult> BonusAsync(MaintenanceContext db, DateTime? nowUTC = null)
+        {
+            var now = nowUTC ?? DateTime.UtcNow;
+            var data = await db.WorkOrders.AsNoTracking().ToListAsync();
+
+            var busiest = data
+                .Where(w => w.Status == "Closed" && w.CompletionDate.HasValue)
+                .GroupBy(w => WeekStartMonday(w.CompletionDate.Value))
+                .Select(g => new { WeekOf = g.Key, Closed = g.Count() })
+                .OrderByDescending(x => x.Closed)
+                .FirstOrDefault();
+
+            var overdue = data
+                .Where(w => w.Status == "Open" && (now - w.RequestDate).TotalDays > 7)
+                .Count();
+            return new BonusResult(busiest?.WeekOf, busiest?.Closed ?? 0, overdue);
+
+        }
+
 
     }
 }

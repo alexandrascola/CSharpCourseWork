@@ -12,7 +12,7 @@ public class MainForm : Form
 
     private readonly TabControl tabs = new() { Dock = DockStyle.Fill };
 
-    private readonly (string Title, DataGridView Grid, FlowLayoutPanel Bar)[] _pages;
+    private readonly (string Title, Control Content, FlowLayoutPanel Bar)[] _pages;
 
     private readonly DataGridView gridTech = MakeGrid();
     private readonly DataGridView gridStatusOverall = MakeGrid();
